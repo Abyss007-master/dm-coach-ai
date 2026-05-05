@@ -35,13 +35,10 @@
       gap: 14px;
     }
     .coach-avatar {
-      width: 46px;
-      height: 46px;
+      width: 46px; height: 46px;
       background: rgba(255,255,255,0.2);
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       font-size: 22px;
     }
     .coach-info h2 { color: #fff; font-size: 18px; font-weight: 700; }
@@ -97,6 +94,7 @@
       border-radius: 18px;
       padding: 12px 18px;
       border-bottom-left-radius: 4px;
+      margin: 0 20px;
     }
     .typing-indicator span {
       display: inline-block;
@@ -180,34 +178,28 @@
         <p><span class="online-dot"></span>Your Digital Marketing Expert</p>
       </div>
     </div>
-
     <div class="chat-messages" id="chatMessages">
       <div class="message bot">
         <div class="msg-avatar">🎯</div>
         <div class="msg-bubble">Hey! I'm your <strong>Digital Marketing Coach</strong>. Ask me anything about SEO, Google Ads, Meta Ads, Content Marketing, Social Media, or growing your brand online. I'm here to help! 🚀</div>
       </div>
     </div>
-
     <div class="typing-indicator" id="typingIndicator">
       <span></span><span></span><span></span>
     </div>
-
     <div class="quick-questions">
       <button class="quick-btn" onclick="askQuick('How do I start with SEO?')">SEO Basics</button>
       <button class="quick-btn" onclick="askQuick('How to run Google Ads?')">Google Ads</button>
       <button class="quick-btn" onclick="askQuick('Best content marketing tips?')">Content Tips</button>
       <button class="quick-btn" onclick="askQuick('How to grow on Instagram?')">Instagram Growth</button>
     </div>
-
     <div class="chat-input-area">
       <textarea id="userInput" placeholder="Ask your digital marketing question..." rows="1"></textarea>
       <button id="sendBtn" onclick="sendMessage()">&#10148;</button>
     </div>
   </div>
-
   <script>
-    const API_URL = '/api/coach';
-
+    const API_URL = window.location.origin + '/api/coach';
     const chatMessages = document.getElementById('chatMessages');
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
@@ -233,7 +225,7 @@
       avatar.textContent = role === 'bot' ? '🎯' : '👤';
       const bubble = document.createElement('div');
       bubble.className = 'msg-bubble';
-      bubble.innerHTML = text.replace(/\n/g, '<br>');
+      bubble.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
       msg.appendChild(avatar);
       msg.appendChild(bubble);
       chatMessages.appendChild(msg);
@@ -257,12 +249,13 @@
         const data = await response.json();
         typingIndicator.style.display = 'none';
         if (data.reply) addMessage(data.reply, 'bot');
-        else addMessage('Sorry, something went wrong. Please try again.', 'bot');
+        else addMessage('Error: ' + (data.error || 'Unknown error'), 'bot');
       } catch (err) {
         typingIndicator.style.display = 'none';
-        addMessage('Network error. Please check your connection.', 'bot');
+        addMessage('Error: ' + err.message, 'bot');
       }
       sendBtn.disabled = false;
+      userInput.focus();
     }
   </script>
 </body>
