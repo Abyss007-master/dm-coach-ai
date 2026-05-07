@@ -582,7 +582,7 @@
 
                     simliWs.onclose = function() {
                         console.log('WebSocket closed');
-                        setSimliStatus('Disconnected', 'error');
+                        setSimliStatus('Disconnected (code:' + e.code + ' reason:' + e.reason + ')', 'error');
                         simliConnected = false;
                         connectSimliBtn.disabled = false;
                         connectSimliBtn.style.display = 'inline-flex';
