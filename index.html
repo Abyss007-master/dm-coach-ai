@@ -503,6 +503,7 @@
 
                 // Get session token from backend
                 simliToken = await getSessionToken();
+                                
                 simliWs = new WebSocket('wss://api.simli.ai/compose/webrtc/p2p?enableSFU=true&session_token=' + simliToken);
 
                 simliWs.onopen = async function() {
@@ -591,7 +592,7 @@
                     // Create and send offer
                     const offer = await simliPc.createOffer();
                     await simliPc.setLocalDescription(offer);
-                    simliWs.send(JSON.stringify({ type: 'offer', sdp: offer.sdp }));
+                    await new Promise(r => { if (simliPc.iceGatheringState === 'complete') { r(); return; } const fn = () => { if (simliPc.iceGatheringState === 'complete') r(); }; simliPc.addEventListener('icegatheringstatechange', fn); setTimeout(r, 3000); }); simliWs.send(JSON.stringify({ type: 'offer', sdp: simliPc.localDescription.sdp }));
 
                 };
 
