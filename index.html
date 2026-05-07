@@ -480,7 +480,7 @@
         let simliWs = null;
         let simliPc = null;
         let simliConnected = false;
-        let simliToken = null;
+        let simliToken = null;                 let simliDc = null;
 
         // ========== SIMLI WEBRTC INTEGRATION ==========
         function setSimliStatus(msg, type) {
@@ -517,7 +517,7 @@
                     });
 
                     // Add transceivers for audio and video
-                    simliPc.addTransceiver('audio', { direction: 'recvonly' });
+                    simliDc = simliPc.createDataChannel('audio-input');                     simliPc.addTransceiver('audio', { direction: 'recvonly' });
                     simliPc.addTransceiver('video', { direction: 'recvonly' });
 
                     // Handle ICE candidates
@@ -623,7 +623,7 @@
 
         function sendSimliAudio(text) {
             // Send text to Simli TTS endpoint through backend
-            if (!simliToken) return;
+            if (!simliToken || !simliDc) return;
 
             fetch('/api/simli-tts', {
                 method: 'POST',
@@ -632,12 +632,12 @@
             }).then(res => res.arrayBuffer()).then(buffer => {
                 // Send PCM audio data through WebRTC
                 const pcmData = new Uint8Array(buffer);
-                if (simliWs && simliWs.readyState === WebSocket.OPEN) {
+                if (simliDc && simliDc.readyState === 'open') {
                     // Send audio frames
                     const chunkSize = 6000;
                     for (let i = 0; i < pcmData.length; i += chunkSize) {
                         const chunk = pcmData.slice(i, i + chunkSize);
-                        simliWs.send(JSON.stringify({ type: 'audio', data: chunk }));
+                        simliDc.send(chunk);
                     }
                 }
             }).catch(console.error);
