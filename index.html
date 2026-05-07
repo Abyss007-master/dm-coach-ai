@@ -558,16 +558,14 @@
 
                     // Handle WebSocket messages
                     simliWs.onmessage = async function(e) {
-                        try {
+                        if (e.data === 'START') { setSimliStatus('AI Avatar Connected!', 'connected'); simliConnected = true; connectSimliBtn.style.display = 'none'; disconnectSimliBtn.classList.add('show'); return; }
+                    try {
                             const msg = JSON.parse(e.data);
                             if (msg.type === 'answer') {
-                                await simliPc.setRemoteDescription(msg);
-                                const answer = await simliPc.createAnswer();
-                                await simliPc.setLocalDescription(answer);
-                                simliWs.send(JSON.stringify({ type: 'answer', sdp: simliPc.localDescription.sdp }));
+                                await simliPc.setRemoteDescription(new RTCSessionDescription(msg));
                             } else if (msg.type === 'ice') {
-                                if (msg.candidate) {
-                                    await simliPc.addIceCandidate(msg.candidate).catch(() => {});
+                                if (msg.data) {
+                                    await simliPc.addIceCandidate(msg.data).catch(() => {});
                                 }
                             }
                         } catch (err) {
