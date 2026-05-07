@@ -1,371 +1,765 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DM Coach AI</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0f0f0f;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 16px;
-    }
-    .chat-wrapper {
-      width: 100%;
-      max-width: 720px;
-      background: #1a1a1a;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-      display: flex;
-      flex-direction: column;
-      height: 92vh;
-      max-height: 760px;
-    }
-    /* CHARACTER SECTION */
-    .character-section {
-      background: linear-gradient(180deg, #0d0d1a 0%, #1a1a2e 100%);
-      padding: 16px 20px 0;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 16px;
-      position: relative;
-      overflow: hidden;
-    }
-    .character-bg {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 40px;
-      background: linear-gradient(135deg, #6c3de8, #3d8bff);
-      border-radius: 0;
-    }
-    .character-wrap {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .character-svg {
-      width: 90px;
-      height: 130px;
-      filter: drop-shadow(0 4px 16px rgba(108,61,232,0.5));
-      transition: transform 0.3s;
-    }
-    .character-svg.talking {
-      animation: talk-bounce 0.4s ease-in-out infinite alternate;
-    }
-    @keyframes talk-bounce {
-      0% { transform: translateY(0px) rotate(-1deg); }
-      100% { transform: translateY(-6px) rotate(1deg); }
-    }
-    .speech-bubble {
-      position: relative;
-      background: #ffffff;
-      color: #1a1a2e;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: 16px;
-      max-width: 200px;
-      text-align: center;
-      margin-bottom: 12px;
-      z-index: 2;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-      line-height: 1.4;
-    }
-    .speech-bubble::after {
-      content: '';
-      position: absolute;
-      bottom: -8px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0; height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-top: 8px solid #ffffff;
-    }
-    /* HEADER */
-    .chat-header {
-      background: linear-gradient(135deg, #6c3de8, #3d8bff);
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .coach-avatar {
-      width: 40px; height: 40px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-    }
-    .coach-info h2 { color: #fff; font-size: 16px; font-weight: 700; }
-    .coach-info p { color: rgba(255,255,255,0.75); font-size: 11px; margin-top: 2px; }
-    .online-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; display: inline-block; margin-right: 5px; }
-    /* MESSAGES */
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      scrollbar-width: thin;
-      scrollbar-color: #333 transparent;
-    }
-    .message { display: flex; gap: 10px; max-width: 85%; }
-    .message.user { align-self: flex-end; flex-direction: row-reverse; }
-    .message.bot { align-self: flex-start; }
-    .msg-avatar {
-      width: 32px; height: 32px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px; flex-shrink: 0;
-    }
-    .bot .msg-avatar { background: linear-gradient(135deg, #6c3de8, #3d8bff); }
-    .user .msg-avatar { background: #2a2a2a; }
-    .msg-bubble { padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.6; }
-    .bot .msg-bubble { background: #252525; color: #e0e0e0; border-bottom-left-radius: 4px; }
-    .user .msg-bubble { background: linear-gradient(135deg, #6c3de8, #3d8bff); color: #fff; border-bottom-right-radius: 4px; }
-    .typing-indicator {
-      display: none; align-self: flex-start;
-      background: #252525; border-radius: 16px;
-      padding: 10px 16px; border-bottom-left-radius: 4px;
-    }
-    .typing-indicator span {
-      display: inline-block; width: 7px; height: 7px;
-      background: #888; border-radius: 50%;
-      animation: bounce 1.2s infinite; margin: 0 2px;
-    }
-    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes bounce {
-      0%, 60%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-5px); }
-    }
-    .quick-questions { padding: 0 16px 10px; display: flex; gap: 8px; flex-wrap: wrap; }
-    .quick-btn {
-      background: #252525; color: #a0a0a0;
-      border: 1px solid #333; border-radius: 20px;
-      padding: 5px 12px; font-size: 11px; cursor: pointer;
-      transition: all 0.2s; white-space: nowrap;
-    }
-    .quick-btn:hover { background: #6c3de8; color: #fff; border-color: #6c3de8; }
-    .chat-input-area {
-      padding: 14px 18px;
-      background: #141414;
-      display: flex; gap: 10px; align-items: flex-end;
-      border-top: 1px solid #222;
-    }
-    #userInput {
-      flex: 1; background: #252525; border: 1px solid #333;
-      border-radius: 12px; padding: 10px 14px;
-      color: #e0e0e0; font-size: 13px; resize: none;
-      min-height: 44px; max-height: 100px; outline: none;
-      font-family: inherit; transition: border 0.2s;
-    }
-    #userInput:focus { border-color: #6c3de8; }
-    #userInput::placeholder { color: #555; }
-    #sendBtn {
-      width: 44px; height: 44px;
-      background: linear-gradient(135deg, #6c3de8, #3d8bff);
-      border: none; border-radius: 12px; color: #fff;
-      font-size: 17px; cursor: pointer; flex-shrink: 0;
-      transition: opacity 0.2s;
-      display: flex; align-items: center; justify-content: center;
-    }
-    #sendBtn:hover { opacity: 0.85; }
-    #sendBtn:disabled { opacity: 0.4; cursor: not-allowed; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DM Coach AI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f0f0f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        .chat-wrapper {
+            width: 100%;
+            max-width: 720px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            height: 92vh;
+            max-height: 760px;
+        }
+        /* CHARACTER SECTION */
+        .character-section {
+            background: linear-gradient(180deg, #0d0d1a 0%, #1a1a2e 100%);
+            padding: 16px 20px 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .character-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: radial-gradient(ellipse at bottom, rgba(138, 43, 226, 0.3) 0%, transparent 70%);
+        }
+        .character-wrap {
+            position: relative;
+            text-align: center;
+            z-index: 2;
+        }
+        .character-svg {
+            width: 140px;
+            height: 180px;
+            filter: drop-shadow(0 0 20px rgba(138, 43, 226, 0.4));
+            transition: all 0.3s ease;
+        }
+        .character-svg.talking {
+            animation: talk-bounce 0.4s ease-in-out infinite alternate;
+        }
+        @keyframes talk-bounce {
+            0% { transform: scale(1) translateY(0); }
+            100% { transform: scale(1.05) translateY(-3px); }
+        }
+        .speech-bubble {
+            background: rgba(30, 30, 40, 0.95);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-size: 13px;
+            color: #a78bfa;
+            margin-top: -8px;
+            display: none;
+            animation: fade-in 0.3s ease;
+        }
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* SIMLI AVATAR SECTION */
+        .simli-avatar-section {
+            display: none;
+            background: #0c0c14;
+            padding: 16px;
+            text-align: center;
+            border-bottom: 2px solid rgba(138, 43, 226, 0.3);
+        }
+        .simli-avatar-section.active {
+            display: block;
+        }
+        .simli-video-container {
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid rgba(138, 43, 226, 0.3);
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.2);
+        }
+        .simli-video-container video {
+            width: 100%;
+            display: block;
+        }
+        .simli-status {
+            font-size: 12px;
+            color: #10b981;
+            margin-top: 8px;
+            display: none;
+        }
+        .simli-status.connecting {
+            color: #f59e0b;
+            display: block;
+        }
+        .simli-status.connected {
+            color: #10b981;
+            display: block;
+        }
+        .simli-status.error {
+            color: #ef4444;
+            display: block;
+        }
+        .connect-simli-btn {
+            margin-top: 12px;
+            padding: 10px 28px;
+            background: linear-gradient(135deg, #8a2be2 0%, #6a0dad 100%);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .connect-simli-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.4);
+        }
+        .connect-simli-btn:disabled {
+            background: #444;
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none;
+            box-shadow: none;
+        }
+        .disconnect-simli-btn {
+            margin-top: 12px;
+            padding: 10px 28px;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+        }
+        .disconnect-simli-btn.show {
+            display: inline-flex;
+        }
+        .disconnect-simli-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+        .simli-avatar-canvas {
+            width: 100%;
+            display: block;
+            border-radius: 16px;
+            background: #000;
+        }
+        /* CHAT HEADER */
+        .chat-header {
+            padding: 14px 20px;
+            background: rgba(30, 30, 40, 0.8);
+            border-bottom: 1px solid rgba(138, 43, 226, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .coach-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #8a2be2 0%, #6a0dad 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            flex-shrink: 0;
+        }
+        .coach-info h2 {
+            font-size: 18px;
+            color: #fff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .coach-info p {
+            font-size: 13px;
+            color: #888;
+            margin-top: 2px;
+        }
+        /* CHAT MESSAGES */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scrollbar-width: thin;
+            scrollbar-color: #8a2be2 #1a1a1a;
+        }
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #8a2be2;
+            border-radius: 3px;
+        }
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
+            animation: message-in 0.3s ease;
+        }
+        @keyframes message-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        .message.bot {
+            align-self: flex-start;
+        }
+        .msg-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .message.user .msg-avatar {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        }
+        .message.bot .msg-avatar {
+            background: linear-gradient(135deg, #8a2be2 0%, #6a0dad 100%);
+        }
+        .msg-bubble {
+            background: rgba(30, 30, 40, 0.9);
+            border: 1px solid rgba(138, 43, 226, 0.2);
+            border-radius: 18px;
+            padding: 12px 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #e5e5e5;
+        }
+        .message.user .msg-bubble {
+            background: linear-gradient(135deg, #8a2be2 0%, #6a0dad 100%);
+            border: none;
+            color: #fff;
+        }
+        .msg-bubble strong {
+            color: #c084fc;
+        }
+        .message.user .msg-bubble strong {
+            color: #ddd;
+        }
+        .typing-indicator {
+            display: none;
+            padding: 8px 20px;
+            gap: 4px;
+        }
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #8a2be2;
+            border-radius: 50%;
+            animation: typing-bounce 1.4s infinite ease-in-out;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing-bounce {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        /* QUICK QUESTIONS */
+        .quick-questions {
+            padding: 12px 20px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            background: rgba(20, 20, 30, 0.5);
+            border-top: 1px solid rgba(138, 43, 226, 0.1);
+        }
+        .quick-btn {
+            padding: 8px 16px;
+            background: rgba(138, 43, 226, 0.1);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            border-radius: 20px;
+            font-size: 13px;
+            color: #c084fc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .quick-btn:hover {
+            background: rgba(138, 43, 226, 0.2);
+            border-color: #8a2be2;
+        }
+        /* INPUT AREA */
+        .chat-input-area {
+            padding: 14px 20px;
+            background: rgba(20, 20, 30, 0.8);
+            border-top: 1px solid rgba(138, 43, 226, 0.2);
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        .chat-input-area textarea {
+            flex: 1;
+            background: rgba(30, 30, 40, 0.8);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            border-radius: 16px;
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #e5e5e5;
+            font-family: inherit;
+            resize: none;
+            max-height: 120px;
+            min-height: 48px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .chat-input-area textarea:focus {
+            border-color: #8a2be2;
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.2);
+        }
+        .chat-input-area textarea::placeholder {
+            color: #666;
+        }
+        .chat-input-area button {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #8a2be2 0%, #6a0dad 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        .chat-input-area button:disabled {
+            background: #444;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .chat-input-area button:hover:not(:disabled) {
+            transform: scale(1.1);
+            box-shadow: 0 4px 20px rgba(138, 43, 226, 0.4);
+        }
+    </style>
 </head>
 <body>
-<div class="chat-wrapper">
+    <div class="chat-wrapper">
+        <!-- Character Section -->
+        <div class="character-section">
+            <div class="character-bg"></div>
+            <div class="character-wrap">
+                <svg id="coachCharacter" class="character-svg" viewBox="0 0 90 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="45" cy="105" rx="35" ry="8" fill="rgba(138,43,226,0.3)"/>
+                    <path d="M30 45 Q45 30 60 45" stroke="#c084fc" stroke-width="4" stroke-linecap="round"/>
+                    <circle cx="38" cy="50" r="3" fill="#c084fc"/>
+                    <circle cx="52" cy="50" r="3" fill="#c084fc"/>
+                    <path id="mouthPath" d="M40 70 Q45 75 50 70" stroke="#c0392b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    <circle cx="45" cy="25" r="30" stroke="#8a2be2" stroke-width="4" fill="none"/>
+                    <path d="M25 35 L20 20" stroke="#8a2be2" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M65 35 L70 20" stroke="#8a2be2" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M25 85 L15 100" stroke="#8a2be2" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M65 85 L75 100" stroke="#8a2be2" stroke-width="3" stroke-linecap="round"/>
+                    <rect x="35" y="80" width="20" height="30" rx="4" stroke="#8a2be2" stroke-width="3" fill="none"/>
+                </svg>
+                <div id="speechBubble" class="speech-bubble">Ask me anything about Digital Marketing!</div>
+            </div>
+        </div>
 
-  <!-- CHARACTER SECTION -->
-  <div class="character-section">
-    <div class="character-wrap">
-      <div class="speech-bubble" id="speechBubble">Ask me anything about Digital Marketing!</div>
-      <svg class="character-svg" id="coachCharacter" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg">
-        <!-- Body / Suit -->
-        <rect x="25" y="85" width="50" height="55" rx="8" fill="#2d2d6b"/>
-        <!-- Shirt / Tie -->
-        <rect x="40" y="85" width="20" height="55" fill="#1e1e4a"/>
-        <polygon points="50,88 46,100 50,105 54,100" fill="#e53e3e"/>
-        <!-- Neck -->
-        <rect x="43" y="72" width="14" height="16" rx="4" fill="#f4a261"/>
-        <!-- Head -->
-        <ellipse cx="50" cy="58" rx="22" ry="22" fill="#f4a261"/>
-        <!-- Hair -->
-        <ellipse cx="50" cy="38" rx="22" ry="10" fill="#2d1b00"/>
-        <rect x="28" y="38" width="44" height="10" rx="4" fill="#2d1b00"/>
-        <!-- Eyes -->
-        <ellipse cx="42" cy="56" rx="4" ry="4.5" fill="white"/>
-        <ellipse cx="58" cy="56" rx="4" ry="4.5" fill="white"/>
-        <circle cx="43" cy="57" r="2.5" fill="#1a1a1a" id="leftEye"/>
-        <circle cx="59" cy="57" r="2.5" fill="#1a1a1a" id="rightEye"/>
-        <!-- Eyebrows -->
-        <path d="M38 50 Q42 47 46 50" stroke="#2d1b00" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <path d="M54 50 Q58 47 62 50" stroke="#2d1b00" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <!-- Nose -->
-        <ellipse cx="50" cy="62" rx="2.5" ry="2" fill="#e07b3a"/>
-        <!-- Mouth (changes when talking) -->
-        <path id="mouthPath" d="M44 70 Q50 75 56 70" stroke="#c0392b" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <!-- Ears -->
-        <ellipse cx="28" cy="58" rx="5" ry="7" fill="#f4a261"/>
-        <ellipse cx="72" cy="58" rx="5" ry="7" fill="#f4a261"/>
-        <!-- Arms -->
-        <rect x="10" y="88" width="16" height="36" rx="8" fill="#2d2d6b"/>
-        <rect x="74" y="88" width="16" height="36" rx="8" fill="#2d2d6b"/>
-        <!-- Hands -->
-        <ellipse cx="18" cy="128" rx="8" ry="6" fill="#f4a261"/>
-        <ellipse cx="82" cy="128" rx="8" ry="6" fill="#f4a261"/>
-        <!-- Laptop in hand -->
-        <rect x="60" y="112" width="26" height="18" rx="3" fill="#333"/>
-        <rect x="62" y="114" width="22" height="13" rx="2" fill="#4a9eff"/>
-        <rect x="58" y="129" width="30" height="3" rx="1.5" fill="#555"/>
-        <!-- Collar / lapels -->
-        <polygon points="40,85 50,95 40,105" fill="#3a3a8a"/>
-        <polygon points="60,85 50,95 60,105" fill="#3a3a8a"/>
-      </svg>
+        <!-- SIMLI AVATAR SECTION -->
+        <div id="simliAvatarSection" class="simli-avatar-section">
+            <div class="simli-video-container">
+                <canvas id="simliCanvas" class="simli-avatar-canvas" width="320" height="240"></canvas>
+            </div>
+            <div id="simliStatus" class="simli-status">Initializing...</div>
+            <button id="connectSimliBtn" class="connect-simli-btn" onclick="startSimli()">
+                <span>&#127909;</span> Enable AI Avatar
+            </button>
+            <button id="disconnectSimliBtn" class="disconnect-simli-btn" onclick="stopSimli()">
+                <span>&#128683;</span> Disable Avatar
+            </button>
+        </div>
+
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div class="coach-avatar">&#127919;</div>
+            <div class="coach-info">
+                <h2>DM Coach AI <span class="online-dot"></span></h2>
+                <p>Your Digital Marketing Expert</p>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chatMessages" class="chat-messages">
+            <div class="message bot">
+                <div class="msg-avatar">&#127919;</div>
+                <div class="msg-bubble">Hey! I'm your <strong>Digital Marketing Coach</strong>. Ask me anything about SEO, Google Ads, Meta Ads, Content Marketing, Social Media, or growing your brand online. I'm here to help!</div>
+            </div>
+        </div>
+
+        <div id="typingIndicator" class="typing-indicator">
+            <span></span><span></span><span></span>
+        </div>
+
+        <!-- Quick Questions -->
+        <div class="quick-questions">
+            <button class="quick-btn" onclick="askQuick('SEO Basics')">SEO Basics</button>
+            <button class="quick-btn" onclick="askQuick('Google Ads')">Google Ads</button>
+            <button class="quick-btn" onclick="askQuick('Content Tips')">Content Tips</button>
+            <button class="quick-btn" onclick="askQuick('Instagram Growth')">Instagram Growth</button>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-area">
+            <textarea id="userInput" placeholder="Ask about SEO, Google Ads, social media..." rows="1"></textarea>
+            <button id="sendBtn" disabled>&#10140;</button>
+        </div>
     </div>
-    <div class="character-bg"></div>
-  </div>
 
-  <!-- HEADER -->
-  <div class="chat-header">
-    <div class="coach-avatar">🎯</div>
-    <div class="coach-info">
-      <h2>DM Coach AI</h2>
-      <p><span class="online-dot"></span>Your Digital Marketing Expert</p>
-    </div>
-  </div>
+    <script>
+        const API_URL = window.location.origin + '/api/coach';
 
-  <!-- MESSAGES -->
-  <div class="chat-messages" id="chatMessages">
-    <div class="message bot">
-      <div class="msg-avatar">🎯</div>
-      <div class="msg-bubble">Hey! I'm your <strong>Digital Marketing Coach</strong>. Ask me anything about SEO, Google Ads, Meta Ads, Content Marketing, Social Media, or growing your brand online. I'm here to help! 🚀</div>
-    </div>
-  </div>
+        // DOM Elements
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const coachCharacter = document.getElementById('coachCharacter');
+        const mouthPath = document.getElementById('mouthPath');
+        const speechBubble = document.getElementById('speechBubble');
+        const connectSimliBtn = document.getElementById('connectSimliBtn');
+        const disconnectSimliBtn = document.getElementById('disconnectSimliBtn');
+        const simliAvatarSection = document.getElementById('simliAvatarSection');
+        const simliStatus = document.getElementById('simliStatus');
+        const simliCanvas = document.getElementById('simliCanvas');
 
-  <div class="typing-indicator" id="typingIndicator">
-    <span></span><span></span><span></span>
-  </div>
+        let isTalking = false;
+        let idleTimer;
+        let simliWs = null;
+        let simliPc = null;
+        let simliConnected = false;
+        let simliToken = null;
 
-  <!-- QUICK QUESTIONS -->
-  <div class="quick-questions">
-    <button class="quick-btn" onclick="askQuick('SEO Basics')">SEO Basics</button>
-    <button class="quick-btn" onclick="askQuick('Google Ads tips')">Google Ads</button>
-    <button class="quick-btn" onclick="askQuick('Content Marketing tips')">Content Tips</button>
-    <button class="quick-btn" onclick="askQuick('Instagram Growth strategies')">Instagram Growth</button>
-  </div>
+        // ========== SIMLI WEBRTC INTEGRATION ==========
+        function setSimliStatus(msg, type) {
+            simliStatus.textContent = msg;
+            simliStatus.className = 'simli-status ' + (type || '');
+        }
 
-  <!-- INPUT -->
-  <div class="chat-input-area">
-    <textarea id="userInput" placeholder="Ask your digital marketing question..." rows="1"></textarea>
-    <button id="sendBtn">&#10148;</button>
-  </div>
+        async function getSessionToken() {
+            const res = await fetch('/api/simli-token', { method: 'POST' });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Failed to get Simli token');
+            return data.session_token;
+        }
 
-</div>
+        async function startSimli() {
+            try {
+                setSimliStatus('Connecting to Simli...', 'connecting');
+                connectSimliBtn.disabled = true;
+                simliAvatarSection.classList.add('active');
 
-<script>
-  const API_URL = window.location.origin + '/api/coach';
-  const chatMessages = document.getElementById('chatMessages');
-  const userInput = document.getElementById('userInput');
-  const sendBtn = document.getElementById('sendBtn');
-  const typingIndicator = document.getElementById('typingIndicator');
-  const coachCharacter = document.getElementById('coachCharacter');
-  const speechBubble = document.getElementById('speechBubble');
-  const mouthPath = document.getElementById('mouthPath');
+                // Get session token from backend
+                simliToken = await getSessionToken();
+                simliWs = new WebSocket('wss://api.simli.ai/compose/webrtc/p2p?session_token=' + simliToken);
 
-  const idlePhrases = [
-    'Ask me anything about Digital Marketing!',
-    'Need SEO tips? I got you!',
-    'Let me help grow your brand!',
-    'Google Ads expert at your service!',
-    'Social Media strategy? Ask away!'
-  ];
+                simliWs.onopen = async function() {
+                    console.log('Simli WebSocket connected');
 
-  let idleTimer;
-  function startIdleCycle() {
-    clearInterval(idleTimer);
-    let i = 0;
-    idleTimer = setInterval(() => {
-      i = (i + 1) % idlePhrases.length;
-      speechBubble.textContent = idlePhrases[i];
-    }, 4000);
-  }
-  startIdleCycle();
+                    // Create WebRTC peer connection
+                    simliPc = new RTCPeerConnection({
+                        iceServers: [
+                            { urls: 'stun:stun.l.google.com:19302' },
+                            { urls: 'stun:global.stun.twilio.com:3478' }
+                        ]
+                    });
 
-  function setTalking(active) {
-    if (active) {
-      coachCharacter.classList.add('talking');
-      mouthPath.setAttribute('d', 'M44 68 Q50 76 56 68');
-      speechBubble.textContent = 'Let me think...';
-      clearInterval(idleTimer);
-    } else {
-      coachCharacter.classList.remove('talking');
-      mouthPath.setAttribute('d', 'M44 70 Q50 75 56 70');
-      speechBubble.textContent = 'Hope that helps! Ask me more!';
-      setTimeout(startIdleCycle, 3000);
-    }
-  }
+                    // Add transceivers for audio and video
+                    simliPc.addTransceiver('audio', { direction: 'sendrecv' });
+                    simliPc.addTransceiver('video', { direction: 'recvonly' });
 
-  userInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-  });
+                    // Handle ICE candidates
+                    simliPc.onicecandidate = function(e) {
+                        if (e.candidate && simliWs && simliWs.readyState === WebSocket.OPEN) {
+                            simliWs.send(JSON.stringify({ type: 'ice', data: e.candidate }));
+                        }
+                    };
 
-  function askQuick(q) { userInput.value = q; sendMessage(); }
+                    // Handle incoming stream
+                    simliPc.ontrack = function(e) {
+                        console.log('Simli track received:', e.track.kind);
+                        if (e.track.kind === 'video') {
+                            const canvas = simliCanvas;
+                            const ctx = canvas.getContext('2d');
+                            const video = document.createElement('video');
+                            video.srcObject = e.streams[0];
+                            video.autoplay = true;
+                            video.onloadedmetadata = function() {
+                                canvas.width = video.videoWidth || 320;
+                                canvas.height = video.videoHeight || 240;
+                            };
+                            video.onplay = function() {
+                                function draw() {
+                                    if (!video.paused && !video.ended) {
+                                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                                    }
+                                    requestAnimationFrame(draw);
+                                }
+                                draw();
+                            };
+                            setSimliStatus('AI Avatar Connected!', 'connected');
+                            simliConnected = true;
+                            connectSimliBtn.style.display = 'none';
+                            disconnectSimliBtn.classList.add('show');
+                        }
+                    };
 
-  function addMessage(text, role) {
-    const msg = document.createElement('div');
-    msg.className = 'message ' + role;
-    const avatar = document.createElement('div');
-    avatar.className = 'msg-avatar';
-    avatar.textContent = role === 'bot' ? '🎯' : '👤';
-    const bubble = document.createElement('div');
-    bubble.className = 'msg-bubble';
-    bubble.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    msg.appendChild(avatar);
-    msg.appendChild(bubble);
-    chatMessages.appendChild(msg);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
+                    // Handle WebSocket messages
+                    simliWs.onmessage = async function(e) {
+                        try {
+                            const msg = JSON.parse(e.data);
+                            if (msg.type === 'answer') {
+                                await simliPc.setRemoteDescription(msg);
+                                const answer = await simliPc.createAnswer();
+                                await simliPc.setLocalDescription(answer);
+                                simliWs.send(JSON.stringify({ type: 'answer', sdp: simliPc.localDescription.sdp }));
+                            } else if (msg.type === 'ice') {
+                                if (msg.candidate) {
+                                    await simliPc.addIceCandidate(msg.candidate).catch(() => {});
+                                }
+                            }
+                        } catch (err) {
+                            console.log('WS message error:', err);
+                        }
+                    };
 
-  async function sendMessage() {
-    const message = userInput.value.trim();
-    if (!message) return;
-    userInput.value = '';
-    sendBtn.disabled = true;
-    addMessage(message, 'user');
-    typingIndicator.style.display = 'flex';
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-    setTalking(true);
-    try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })
-      });
-      const data = await response.json();
-      typingIndicator.style.display = 'none';
-      if (data.reply) addMessage(data.reply, 'bot');
-      else addMessage('Error: ' + (data.error || 'Unknown error'), 'bot');
-    } catch (err) {
-      typingIndicator.style.display = 'none';
-      addMessage('Error: ' + err.message, 'bot');
-    }
-    setTalking(false);
-    sendBtn.disabled = false;
-    userInput.focus();
-  }
-</script>
+                    simliWs.onerror = function(e) {
+                        console.error('WebSocket error:', e);
+                        setSimliStatus('Connection error', 'error');
+                        connectSimliBtn.disabled = false;
+                    };
+
+                    simliWs.onclose = function() {
+                        console.log('WebSocket closed');
+                        setSimliStatus('Disconnected', 'error');
+                        simliConnected = false;
+                        connectSimliBtn.disabled = false;
+                        connectSimliBtn.style.display = 'inline-flex';
+                        disconnectSimliBtn.classList.remove('show');
+                    };
+
+                    // Create and send offer
+                    const offer = await simliPc.createOffer();
+                    await simliPc.setLocalDescription(offer);
+                    simliWs.send(JSON.stringify({ type: 'offer', sdp: offer.sdp }));
+
+                };
+
+            } catch (err) {
+                console.error('Simli connect error:', err);
+                setSimliStatus('Error: ' + err.message, 'error');
+                connectSimliBtn.disabled = false;
+                simliAvatarSection.classList.remove('active');
+            }
+        }
+
+        function stopSimli() {
+            if (simliWs) {
+                simliWs.close();
+                simliWs = null;
+            }
+            if (simliPc) {
+                simliPc.close();
+                simliPc = null;
+            }
+            simliConnected = false;
+            simliToken = null;
+            simliAvatarSection.classList.remove('active');
+            connectSimliBtn.disabled = false;
+            connectSimliBtn.style.display = 'inline-flex';
+            disconnectSimliBtn.classList.remove('show');
+            console.log('Simli stopped');
+        }
+
+        function sendSimliAudio(text) {
+            // Send text to Simli TTS endpoint through backend
+            if (!simliToken) return;
+
+            fetch('/api/simli-tts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text, session_token: simliToken })
+            }).then(res => res.arrayBuffer()).then(buffer => {
+                // Send PCM audio data through WebRTC
+                const pcmData = new Uint8Array(buffer);
+                if (simliWs && simliWs.readyState === WebSocket.OPEN) {
+                    // Send audio frames
+                    const chunkSize = 6000;
+                    for (let i = 0; i < pcmData.length; i += chunkSize) {
+                        const chunk = pcmData.slice(i, i + chunkSize);
+                        simliWs.send(JSON.stringify({ type: 'audio', data: chunk }));
+                    }
+                }
+            }).catch(console.error);
+        }
+
+        // ========== ORIGINAL CHAT BOT CODE ==========
+        const idlePhrases = [
+            'Ask me anything about Digital Marketing!',
+            'Need SEO tips? I got you!',
+            'Let me help grow your brand!',
+            'Google Ads expert at your service!',
+            'Social Media strategy? Ask away!'
+        ];
+
+        function startIdleCycle() {
+            clearInterval(idleTimer);
+            idleTimer = setInterval(() => {
+                if (!isTalking && chatMessages.children.length <= 2) {
+                    const phrase = idlePhrases[Math.floor(Math.random() * idlePhrases.length)];
+                    speechBubble.textContent = phrase;
+                    speechBubble.style.display = 'block';
+                    setTimeout(() => {
+                        speechBubble.style.display = 'none';
+                    }, 4000);
+                }
+            }, 8000);
+        }
+
+        function setTalking(active) {
+            isTalking = active;
+            if (active) {
+                coachCharacter.classList.add('talking');
+                mouthPath.setAttribute('d', 'M40 68 Q45 78 50 68');
+                speechBubble.textContent = 'Thinking...';
+                speechBubble.style.display = 'block';
+                clearInterval(idleTimer);
+            } else {
+                coachCharacter.classList.remove('talking');
+                mouthPath.setAttribute('d', 'M40 70 Q45 75 50 70');
+                speechBubble.textContent = 'Ask me more!';
+            }
+        }
+
+        function addMessage(text, sender) {
+            const msg = document.createElement('div');
+            msg.className = 'message ' + sender;
+            const avatar = sender === 'user' ? '&#128100;' : '&#127919;';
+            msg.innerHTML = '\n                <div class="msg-avatar">' + avatar + '</div>\n                <div class="msg-bubble">' + text + '</div>\n            ';
+            chatMessages.appendChild(msg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendMessage(message) {
+            if (!message.trim()) return;
+
+            addMessage(message, 'user');
+            userInput.value = '';
+            userInput.style.height = 'auto';
+            sendBtn.disabled = true;
+
+            typingIndicator.style.display = 'flex';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            setTalking(true);
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                const data = await response.json();
+                typingIndicator.style.display = 'none';
+                if (data.reply) {
+                    addMessage(data.reply, 'bot');
+                    // If Simli is connected, send audio to avatar
+                    if (simliConnected) {
+                        sendSimliAudio(data.reply);
+                    }
+                } else {
+                    addMessage('Error: ' + (data.error || 'Unknown error'), 'bot');
+                }
+            } catch (err) {
+                typingIndicator.style.display = 'none';
+                addMessage('Error: ' + err.message, 'bot');
+            }
+
+            setTalking(false);
+            setTimeout(() => {
+                speechBubble.style.display = 'none';
+                startIdleCycle();
+            }, 3000);
+        }
+
+        function askQuick(question) {
+            sendMessage(question);
+        }
+
+        // Event Listeners
+        userInput.addEventListener('input', function() {
+            userInput.style.height = 'auto';
+            userInput.style.height = (userInput.scrollHeight) + 'px';
+            sendBtn.disabled = !this.value.trim();
+        });
+
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage(this.value);
+            }
+        });
+
+        sendBtn.addEventListener('click', function() {
+            sendMessage(userInput.value);
+        });
+
+        // Auto-focus input on load
+        setTimeout(() => userInput.focus(), 300);
+
+        // Start idle cycle
+        startIdleCycle();
+    </script>
 </body>
 </html>
