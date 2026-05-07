@@ -504,7 +504,7 @@
                 // Get session token from backend
                 simliToken = await getSessionToken();
                                 
-                simliWs = new WebSocket('wss://api.simli.ai/compose/webrtc/p2p?enableSFU=true&session_token=' + simliToken);
+                simliWs = new WebSocket('wss://api.simli.ai/compose/webrtc/p2p?session_token=' + simliToken);
 
                 simliWs.onopen = async function() {
                     console.log('Simli WebSocket connected');
