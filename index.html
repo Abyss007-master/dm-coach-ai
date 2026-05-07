@@ -517,7 +517,7 @@
                     });
 
                     // Add transceivers for audio and video
-                    simliDc = simliPc.createDataChannel('audio-input');                     simliPc.addTransceiver('audio', { direction: 'recvonly' });
+                    simliPc.addTransceiver('audio', { direction: 'recvonly' });
                     simliPc.addTransceiver('video', { direction: 'recvonly' });
 
                     // Handle ICE candidates
@@ -558,7 +558,7 @@
 
                     // Handle WebSocket messages
                     simliWs.onmessage = async function(e) {
-                        if (e.data === 'START') { setSimliStatus('AI Avatar Connected!', 'connected'); simliConnected = true; connectSimliBtn.style.display = 'none'; disconnectSimliBtn.classList.add('show'); return; }
+                        simliPc.addTrif (e.data === 'START') { setSimliStatus('AI Avatar Connected!', 'connected'); simliConnected = true; connectSimliBtn.style.display = 'none'; disconnectSimliBtn.classList.add('show'); setTimeout(() => { if (simliWs && simliWs.readyState === WebSocket.OPEN) { simliWs.send(new Uint8Array(64000)); } }, 100); return; }ansceiver('audio', { direction: 'recvonly' });
                     try {
                             const msg = JSON.parse(e.data);
                             if (msg.type === 'answer') {
@@ -623,7 +623,7 @@
 
         function sendSimliAudio(text) {
             // Send text to Simli TTS endpoint through backend
-            if (!simliToken || !simliDc) return;
+            if (!simliToken || !simliWs) return;
 
             fetch('/api/simli-tts', {
                 method: 'POST',
@@ -632,12 +632,12 @@
             }).then(res => res.arrayBuffer()).then(buffer => {
                 // Send PCM audio data through WebRTC
                 const pcmData = new Uint8Array(buffer);
-                if (simliDc && simliDc.readyState === 'open') {
+                if (simliWs && simliWs.readyState === WebSocket.OPEN) {
                     // Send audio frames
                     const chunkSize = 6000;
                     for (let i = 0; i < pcmData.length; i += chunkSize) {
                         const chunk = pcmData.slice(i, i + chunkSize);
-                        simliDc.send(chunk);
+                        simliWs.send(chunk);
                     }
                 }
             }).catch(console.error);
