@@ -13,13 +13,15 @@ export default async function handler(req, res) {
 
   try {
     const SIMLI_API_KEY = process.env.SIMLI_API_KEY;
-    const FACE_ID = '3c90c3cc-0d44-4b50-8888-8dd25736052a'; // Default Simli face
 
     if (!SIMLI_API_KEY) {
       return res.status(500).json({ error: 'SIMLI_API_KEY not configured' });
     }
 
-    // Call Simli compose token endpoint
+    // Use Simli's well-known default face (tmp9i8bbq7c)
+    // or override with env variable SIMLI_FACE_ID
+    const FACE_ID = process.env.SIMLI_FACE_ID || 'tmp9i8bbq7c';
+
     const tokenRes = await fetch('https://api.simli.ai/compose/token', {
       method: 'POST',
       headers: {
@@ -28,23 +30,37 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         faceId: FACE_ID,
+        apiVersion: 'v2',
+        sessionAggregator: null,
         handleSilence: true,
         maxSessionLength: 600,
         maxIdleTime: 180,
-        model: 'fasttalk'
+        startFrame: 0,
+        audioInputFormat: 'pcm16'
       })
     });
 
-    const data = await tokenRes.json();
+    const responseText = await tokenRes.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error('Simli raw response:', responseText);
+      return res.status(500).json({ error: 'Invalid JSON from Simli: ' + responseText.substring(0, 200) });
+    }
 
     if (!tokenRes.ok) {
-      return res.status(tokenRes.status).json({ error: data.error || data.message || 'Simli token error' });
+      console.error('Simli error response:', data);
+      return res.status(tokenRes.status).json({
+        error: data.detail || data.error || data.message || 'Simli token API error',
+        raw: data
+      });
     }
 
     return res.status(200).json(data);
 
   } catch (error) {
-    console.error('Simli token error:', error.message);
-    return res.status(500).json({ error: 'Failed to generate Simli session token: ' + error.message });
+    console.error('Simli token handler error:', error.message);
+    return res.status(500).json({ error: 'Failed to generate token: ' + error.message });
   }
 }
