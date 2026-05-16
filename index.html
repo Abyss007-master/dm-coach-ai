@@ -27,153 +27,6 @@
             height: 92vh;
             max-height: 760px;
         }
-        /* CHARACTER SECTION */
-        .character-section {
-            background: linear-gradient(180deg, #0d0d1a 0%, #1a1a2e 100%);
-            padding: 16px 20px 0;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            gap: 16px;
-            position: relative;
-            overflow: hidden;
-        }
-        .character-bg {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 40px;
-            background: radial-gradient(ellipse at bottom, rgba(138, 43, 226, 0.3) 0%, transparent 70%);
-        }
-        .character-wrap {
-            position: relative;
-            text-align: center;
-            z-index: 2;
-        }
-        .character-svg {
-            width: 140px;
-            height: 180px;
-            filter: drop-shadow(0 0 20px rgba(138, 43, 226, 0.4));
-            transition: all 0.3s ease;
-        }
-        .character-svg.talking {
-            animation: talk-bounce 0.4s ease-in-out infinite alternate;
-        }
-        @keyframes talk-bounce {
-            0% { transform: scale(1) translateY(0); }
-            100% { transform: scale(1.05) translateY(-3px); }
-        }
-        .speech-bubble {
-            background: rgba(30, 30, 40, 0.95);
-            border: 1px solid rgba(138, 43, 226, 0.3);
-            border-radius: 12px;
-            padding: 8px 16px;
-            font-size: 13px;
-            color: #a78bfa;
-            margin-top: -8px;
-            display: none;
-            animation: fade-in 0.3s ease;
-        }
-        @keyframes fade-in {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        /* SIMLI AVATAR SECTION */
-        .simli-avatar-section {
-            display: block;
-            background: #0c0c14;
-            padding: 16px;
-            text-align: center;
-            border-bottom: 2px solid rgba(138, 43, 226, 0.3);
-        }
-        .simli-avatar-section.active {
-            display: block;
-        }
-        .simli-video-container {
-            position: relative;
-            width: 100%;
-            max-width: 320px;
-            margin: 0 auto;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 2px solid rgba(138, 43, 226, 0.3);
-            box-shadow: 0 0 30px rgba(138, 43, 226, 0.2);
-        }
-        .simli-video-container video {
-            width: 100%;
-            display: block;
-        }
-        .simli-status {
-            font-size: 12px;
-            color: #10b981;
-            margin-top: 8px;
-            display: none;
-        }
-        .simli-status.connecting {
-            color: #f59e0b;
-            display: block;
-        }
-        .simli-status.connected {
-            color: #10b981;
-            display: block;
-        }
-        .simli-status.error {
-            color: #ef4444;
-            display: block;
-        }
-        .connect-simli-btn {
-            margin-top: 12px;
-            padding: 10px 28px;
-            background: linear-gradient(135deg, #8a2be2 0%, #6a0dad 100%);
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .connect-simli-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.4);
-        }
-        .connect-simli-btn:disabled {
-            background: #444;
-            cursor: not-allowed;
-            opacity: 0.6;
-            transform: none;
-            box-shadow: none;
-        }
-        .disconnect-simli-btn {
-            margin-top: 12px;
-            padding: 10px 28px;
-            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: none;
-        }
-        .disconnect-simli-btn.show {
-            display: inline-flex;
-        }
-        .disconnect-simli-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
-        }
-        .simli-avatar-canvas {
-            width: 100%;
-            display: block;
-            border-radius: 16px;
-            background: #000;
-        }
         /* CHAT HEADER */
         .chat-header {
             padding: 14px 20px;
@@ -229,13 +82,8 @@
             scrollbar-width: thin;
             scrollbar-color: #8a2be2 #1a1a1a;
         }
-        .chat-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: #8a2be2;
-            border-radius: 3px;
-        }
+        .chat-messages::-webkit-scrollbar { width: 6px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: #8a2be2; border-radius: 3px; }
         .message {
             display: flex;
             gap: 12px;
@@ -246,13 +94,8 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .message.user {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
-        .message.bot {
-            align-self: flex-start;
-        }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        .message.bot  { align-self: flex-start; }
         .msg-avatar {
             width: 36px;
             height: 36px;
@@ -263,12 +106,8 @@
             font-size: 20px;
             flex-shrink: 0;
         }
-        .message.user .msg-avatar {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-        }
-        .message.bot .msg-avatar {
-            background: linear-gradient(135deg, #8a2be2 0%, #6a0dad 100%);
-        }
+        .message.user .msg-avatar { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
+        .message.bot  .msg-avatar { background: linear-gradient(135deg, #8a2be2 0%, #6a0dad 100%); }
         .msg-bubble {
             background: rgba(30, 30, 40, 0.9);
             border: 1px solid rgba(138, 43, 226, 0.2);
@@ -283,12 +122,8 @@
             border: none;
             color: #fff;
         }
-        .msg-bubble strong {
-            color: #c084fc;
-        }
-        .message.user .msg-bubble strong {
-            color: #ddd;
-        }
+        .msg-bubble strong { color: #c084fc; }
+        .message.user .msg-bubble strong { color: #ddd; }
         .typing-indicator {
             display: none;
             padding: 8px 20px;
@@ -359,9 +194,7 @@
             border-color: #8a2be2;
             box-shadow: 0 0 15px rgba(138, 43, 226, 0.2);
         }
-        .chat-input-area textarea::placeholder {
-            color: #666;
-        }
+        .chat-input-area textarea::placeholder { color: #666; }
         .chat-input-area button {
             width: 48px;
             height: 48px;
@@ -374,11 +207,7 @@
             transition: all 0.3s ease;
             flex-shrink: 0;
         }
-        .chat-input-area button:disabled {
-            background: #444;
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
+        .chat-input-area button:disabled { background: #444; cursor: not-allowed; opacity: 0.5; }
         .chat-input-area button:hover:not(:disabled) {
             transform: scale(1.1);
             box-shadow: 0 4px 20px rgba(138, 43, 226, 0.4);
@@ -387,42 +216,7 @@
 </head>
 <body>
     <div class="chat-wrapper">
-        <!-- Character Section -->
-        <div class="character-section">
-            <div class="character-bg"></div>
-            <div class="character-wrap">
-                <svg id="coachCharacter" class="character-svg" viewBox="0 0 90 130" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="45" cy="105" rx="35" ry="8" fill="rgba(138,43,226,0.3)"/>
-                    <path d="M30 45 Q45 30 60 45" stroke="#c084fc" stroke-width="4" stroke-linecap="round"/>
-                    <circle cx="38" cy="50" r="3" fill="#c084fc"/>
-                    <circle cx="52" cy="50" r="3" fill="#c084fc"/>
-                    <path id="mouthPath" d="M40 70 Q45 75 50 70" stroke="#c0392b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                    <circle cx="45" cy="25" r="30" stroke="#8a2be2" stroke-width="4" fill="none"/>
-                    <path d="M25 35 L20 20" stroke="#8a2be2" stroke-width="3" stroke-linecap="round"/>
-                    <path d="M65 35 L70 20" stroke="#8a2be2" stroke-width="3" stroke-linecap="round"/>
-                    <path d="M25 85 L15 100" stroke="#8a2be2" stroke-width="3" stroke-linecap="round"/>
-                    <path d="M65 85 L75 100" stroke="#8a2be2" stroke-width="3" stroke-linecap="round"/>
-                    <rect x="35" y="80" width="20" height="30" rx="4" stroke="#8a2be2" stroke-width="3" fill="none"/>
-                </svg>
-                <div id="speechBubble" class="speech-bubble">Ask me anything about Digital Marketing!</div>
-            </div>
-        </div>
-
-        <!-- SIMLI AVATAR SECTION -->
-        <div id="simliAvatarSection" class="simli-avatar-section">
-            <div class="simli-video-container">
-                <canvas id="simliCanvas" class="simli-avatar-canvas" width="320" height="240"></canvas>
-            </div>
-            <div id="simliStatus" class="simli-status">Initializing...</div>
-            <button id="connectSimliBtn" class="connect-simli-btn" onclick="startSimli()">
-                <span>&#127909;</span> Enable AI Avatar
-            </button>
-            <button id="disconnectSimliBtn" class="disconnect-simli-btn" onclick="stopSimli()">
-                <span>&#128683;</span> Disable Avatar
-            </button>
-        </div>
-
-        <!-- Chat Header -->
+        <!-- CHAT HEADER -->
         <div class="chat-header">
             <div class="coach-avatar">&#127919;</div>
             <div class="coach-info">
@@ -431,19 +225,20 @@
             </div>
         </div>
 
-        <!-- Chat Messages -->
-        <div id="chatMessages" class="chat-messages">
+        <!-- CHAT MESSAGES -->
+        <div class="chat-messages" id="chatMessages">
             <div class="message bot">
                 <div class="msg-avatar">&#127919;</div>
                 <div class="msg-bubble">Hey! I'm your <strong>Digital Marketing Coach</strong>. Ask me anything about SEO, Google Ads, Meta Ads, Content Marketing, Social Media, or growing your brand online. I'm here to help!</div>
             </div>
         </div>
 
-        <div id="typingIndicator" class="typing-indicator">
+        <!-- TYPING INDICATOR -->
+        <div class="typing-indicator" id="typingIndicator" style="display:none;">
             <span></span><span></span><span></span>
         </div>
 
-        <!-- Quick Questions -->
+        <!-- QUICK QUESTIONS -->
         <div class="quick-questions">
             <button class="quick-btn" onclick="askQuick('SEO Basics')">SEO Basics</button>
             <button class="quick-btn" onclick="askQuick('Google Ads')">Google Ads</button>
@@ -451,258 +246,38 @@
             <button class="quick-btn" onclick="askQuick('Instagram Growth')">Instagram Growth</button>
         </div>
 
-        <!-- Input -->
+        <!-- INPUT AREA -->
         <div class="chat-input-area">
             <textarea id="userInput" placeholder="Ask about SEO, Google Ads, social media..." rows="1"></textarea>
-            <button id="sendBtn" disabled>&#10140;</button>
+            <button id="sendBtn" disabled>&#10151;</button>
         </div>
     </div>
 
     <script>
         const API_URL = window.location.origin + '/api/coach';
 
-        // DOM Elements
         const chatMessages = document.getElementById('chatMessages');
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
         const typingIndicator = document.getElementById('typingIndicator');
-        const coachCharacter = document.getElementById('coachCharacter');
-        const mouthPath = document.getElementById('mouthPath');
-        const speechBubble = document.getElementById('speechBubble');
-        const connectSimliBtn = document.getElementById('connectSimliBtn');
-        const disconnectSimliBtn = document.getElementById('disconnectSimliBtn');
-        const simliAvatarSection = document.getElementById('simliAvatarSection');
-        const simliStatus = document.getElementById('simliStatus');
-        const simliCanvas = document.getElementById('simliCanvas');
-
-        let isTalking = false;
-        let idleTimer;
-        let simliWs = null;
-        let simliPc = null;
-        let simliConnected = false;
-        let simliToken = null;                 let simliDc = null;
-
-        // ========== SIMLI WEBRTC INTEGRATION ==========
-        function setSimliStatus(msg, type) {
-            simliStatus.textContent = msg;
-            simliStatus.className = 'simli-status ' + (type || '');
-        }
-
-        async function getSessionToken() {
-            const res = await fetch('/api/simli-token', { method: 'POST' });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Failed to get Simli token');
-            return data.session_token;
-        }
-
-        async function startSimli() {
-            try {
-                setSimliStatus('Connecting to Simli...', 'connecting');
-                connectSimliBtn.disabled = true;
-                simliAvatarSection.classList.add('active');
-
-                // Get session token from backend
-                simliToken = await getSessionToken();
-                                
-                simliWs = new WebSocket('wss://api.simli.ai/compose/webrtc/p2p?session_token=' + simliToken);
-
-                simliWs.onopen = async function() {
-                    console.log('Simli WebSocket connected');
-
-                    // Create WebRTC peer connection
-                    simliPc = new RTCPeerConnection({
-                        iceServers: [
-                            { urls: 'stun:stun.l.google.com:19302' },
-                            { urls: 'stun:global.stun.twilio.com:3478' }
-                        ]
-                    });
-
-                    // Add transceivers for audio and video
-                    simliPc.addTransceiver('audio', { direction: 'recvonly' });
-                    simliPc.addTransceiver('video', { direction: 'recvonly' });
-
-                    // Handle ICE candidates
-                    simliPc.onicecandidate = function(e) {
-                        if (e.candidate && simliWs && simliWs.readyState === WebSocket.OPEN) {
-                            simliWs.send(JSON.stringify({ type: 'ice', data: e.candidate }));
-                        }
-                    };
-
-                    // Handle incoming stream
-                    simliPc.ontrack = function(e) {
-                        console.log('Simli track received:', e.track.kind);
-                        if (e.track.kind === 'video') {
-                            const canvas = simliCanvas;
-                            const ctx = canvas.getContext('2d');
-                            const video = document.createElement('video');
-                            video.srcObject = e.streams[0];
-                            video.autoplay = true;
-                            video.onloadedmetadata = function() {
-                                canvas.width = video.videoWidth || 320;
-                                canvas.height = video.videoHeight || 240;
-                            };
-                            video.onplay = function() {
-                                function draw() {
-                                    if (!video.paused && !video.ended) {
-                                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                                    }
-                                    requestAnimationFrame(draw);
-                                }
-                                draw();
-                            };
-                            setSimliStatus('AI Avatar Connected!', 'connected');
-                            simliConnected = true;
-                            connectSimliBtn.style.display = 'none';
-                            disconnectSimliBtn.classList.add('show');
-                        }
-                    };
-
-                    // Handle WebSocket messages
-                    simliWs.onmessage = async function(e) {
-                        simliPc.addTrif (e.data === 'START') { setSimliStatus('AI Avatar Connected!', 'connected'); simliConnected = true; connectSimliBtn.style.display = 'none'; disconnectSimliBtn.classList.add('show'); setTimeout(() => { if (simliWs && simliWs.readyState === WebSocket.OPEN) { simliWs.send(new Uint8Array(64000)); } }, 100); return; }ansceiver('audio', { direction: 'recvonly' });
-                    try {
-                            const msg = JSON.parse(e.data);
-                            if (msg.type === 'answer') {
-                                await simliPc.setRemoteDescription(new RTCSessionDescription(msg));
-                            } else if (msg.type === 'ice') {
-                                if (msg.data) {
-                                    await simliPc.addIceCandidate(msg.data).catch(() => {});
-                                }
-                            }
-                        } catch (err) {
-                            console.log('WS message error:', err);
-                        }
-                    };
-
-                    simliWs.onerror = function(e) {
-                        console.error('WebSocket error:', e);
-                        setSimliStatus('Connection error', 'error');
-                        connectSimliBtn.disabled = false;
-                    };
-
-                    simliWs.onclose = function() {
-                        console.log('WebSocket closed');
-                        setSimliStatus('Disconnected (code:' + e.code + ' reason:' + e.reason + ')', 'error');
-                        simliConnected = false;
-                        connectSimliBtn.disabled = false;
-                        connectSimliBtn.style.display = 'inline-flex';
-                        disconnectSimliBtn.classList.remove('show');
-                    };
-
-                    // Create and send offer
-                    const offer = await simliPc.createOffer();
-                    await simliPc.setLocalDescription(offer);
-                    await new Promise(r => { if (simliPc.iceGatheringState === 'complete') { r(); return; } const fn = () => { if (simliPc.iceGatheringState === 'complete') r(); }; simliPc.addEventListener('icegatheringstatechange', fn); setTimeout(r, 3000); }); simliWs.send(JSON.stringify({ type: 'offer', sdp: simliPc.localDescription.sdp }));
-
-                };
-
-            } catch (err) {
-                console.error('Simli connect error:', err);
-                setSimliStatus('Error: ' + err.message, 'error');
-                connectSimliBtn.disabled = false;
-                simliAvatarSection.classList.remove('active');
-            }
-        }
-
-        function stopSimli() {
-            if (simliWs) {
-                simliWs.close();
-                simliWs = null;
-            }
-            if (simliPc) {
-                simliPc.close();
-                simliPc = null;
-            }
-            simliConnected = false;
-            simliToken = null;
-            simliAvatarSection.classList.remove('active');
-            connectSimliBtn.disabled = false;
-            connectSimliBtn.style.display = 'inline-flex';
-            disconnectSimliBtn.classList.remove('show');
-            console.log('Simli stopped');
-        }
-
-        function sendSimliAudio(text) {
-            // Send text to Simli TTS endpoint through backend
-            if (!simliToken || !simliWs) return;
-
-            fetch('/api/simli-tts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: text, session_token: simliToken })
-            }).then(res => res.arrayBuffer()).then(buffer => {
-                // Send PCM audio data through WebRTC
-                const pcmData = new Uint8Array(buffer);
-                if (simliWs && simliWs.readyState === WebSocket.OPEN) {
-                    // Send audio frames
-                    const chunkSize = 6000;
-                    for (let i = 0; i < pcmData.length; i += chunkSize) {
-                        const chunk = pcmData.slice(i, i + chunkSize);
-                        simliWs.send(chunk);
-                    }
-                }
-            }).catch(console.error);
-        }
-
-        // ========== ORIGINAL CHAT BOT CODE ==========
-        const idlePhrases = [
-            'Ask me anything about Digital Marketing!',
-            'Need SEO tips? I got you!',
-            'Let me help grow your brand!',
-            'Google Ads expert at your service!',
-            'Social Media strategy? Ask away!'
-        ];
-
-        function startIdleCycle() {
-            clearInterval(idleTimer);
-            idleTimer = setInterval(() => {
-                if (!isTalking && chatMessages.children.length <= 2) {
-                    const phrase = idlePhrases[Math.floor(Math.random() * idlePhrases.length)];
-                    speechBubble.textContent = phrase;
-                    speechBubble.style.display = 'block';
-                    setTimeout(() => {
-                        speechBubble.style.display = 'none';
-                    }, 4000);
-                }
-            }, 8000);
-        }
-
-        function setTalking(active) {
-            isTalking = active;
-            if (active) {
-                coachCharacter.classList.add('talking');
-                mouthPath.setAttribute('d', 'M40 68 Q45 78 50 68');
-                speechBubble.textContent = 'Thinking...';
-                speechBubble.style.display = 'block';
-                clearInterval(idleTimer);
-            } else {
-                coachCharacter.classList.remove('talking');
-                mouthPath.setAttribute('d', 'M40 70 Q45 75 50 70');
-                speechBubble.textContent = 'Ask me more!';
-            }
-        }
 
         function addMessage(text, sender) {
             const msg = document.createElement('div');
             msg.className = 'message ' + sender;
             const avatar = sender === 'user' ? '&#128100;' : '&#127919;';
-            msg.innerHTML = '\n                <div class="msg-avatar">' + avatar + '</div>\n                <div class="msg-bubble">' + text + '</div>\n            ';
+            msg.innerHTML = '<div class="msg-avatar">' + avatar + '</div><div class="msg-bubble">' + text + '</div>';
             chatMessages.appendChild(msg);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         async function sendMessage(message) {
             if (!message.trim()) return;
-
             addMessage(message, 'user');
             userInput.value = '';
             userInput.style.height = 'auto';
             sendBtn.disabled = true;
-
             typingIndicator.style.display = 'flex';
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            setTalking(true);
-
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -713,10 +288,6 @@
                 typingIndicator.style.display = 'none';
                 if (data.reply) {
                     addMessage(data.reply, 'bot');
-                    // If Simli is connected, send audio to avatar
-                    if (simliConnected) {
-                        sendSimliAudio(data.reply);
-                    }
                 } else {
                     addMessage('Error: ' + (data.error || 'Unknown error'), 'bot');
                 }
@@ -724,19 +295,12 @@
                 typingIndicator.style.display = 'none';
                 addMessage('Error: ' + err.message, 'bot');
             }
-
-            setTalking(false);
-            setTimeout(() => {
-                speechBubble.style.display = 'none';
-                startIdleCycle();
-            }, 3000);
         }
 
         function askQuick(question) {
             sendMessage(question);
         }
 
-        // Event Listeners
         userInput.addEventListener('input', function() {
             userInput.style.height = 'auto';
             userInput.style.height = (userInput.scrollHeight) + 'px';
@@ -754,11 +318,7 @@
             sendMessage(userInput.value);
         });
 
-        // Auto-focus input on load
         setTimeout(() => userInput.focus(), 300);
-
-        // Start idle cycle
-        startIdleCycle();
     </script>
 </body>
 </html>
